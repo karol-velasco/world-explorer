@@ -1,40 +1,33 @@
 import React from "react";
 import { formatearNumero } from "../servicios/servicioPaises";
 
+// Componente Ventana Modal para ver todos los detalles de un país
 export function ModalPais({ pais, alCerrar, esFavorito, alAlternarFavorito, estaComparando, alAlternarComparar, mapaPaises, alSeleccionarFrontera }) {
+  // Si no hay un país seleccionado, no dibujamos nada
   if (!pais) return null;
-
-  const nombreMostrar = pais.nombreEspanol || pais.nombre;
 
   return (
     <div className="modal-overlay" onClick={alCerrar}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close-btn" onClick={alCerrar} title="Cerrar (Esc)">
+        {/* Botón para cerrar */}
+        <button className="modal-close-btn" onClick={alCerrar} title="Cerrar">
           ✕
         </button>
 
         <div className="modal-body">
           <div className="modal-header-grid">
             <div>
-              <img
-                src={pais.banderaSvg || pais.banderaPng}
-                alt={`Bandera de ${nombreMostrar}`}
-                className="modal-flag-img"
-              />
+              <img src={pais.bandera} alt={pais.nombre} className="modal-flag-img" />
               {pais.escudo && (
                 <div style={{ marginTop: "16px", textAlign: "center" }}>
-                  <img
-                    src={pais.escudo}
-                    alt="Escudo de armas"
-                    style={{ height: "60px", objectFit: "contain" }}
-                  />
-                  <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "4px" }}>Escudo Oficial</div>
+                  <img src={pais.escudo} alt="Escudo" style={{ height: "60px", objectFit: "contain" }} />
+                  <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Escudo Oficial</div>
                 </div>
               )}
             </div>
 
             <div className="modal-info-main">
-              <h2 className="modal-country-name">{nombreMostrar}</h2>
+              <h2 className="modal-country-name">{pais.nombre}</h2>
               <div className="modal-country-official">{pais.nombreOficial}</div>
 
               <div className="modal-badge-group">
@@ -44,43 +37,38 @@ export function ModalPais({ pais, alCerrar, esFavorito, alAlternarFavorito, esta
                 </span>
                 {pais.sinSalidaMar && (
                   <span className="region-badge" style={{ background: "rgba(245, 158, 11, 0.12)", color: "#f59e0b" }}>
-                    🔒 Sin salida al mar
+                    Sin salida al mar
                   </span>
                 )}
                 {pais.miembroOnu && (
                   <span className="region-badge" style={{ background: "rgba(59, 130, 246, 0.12)", color: "#3b82f6" }}>
-                    🇺🇳 Miembro ONU
+                    Miembro ONU
                   </span>
                 )}
               </div>
 
               <div className="modal-actions-bar">
                 <a
-                  href={pais.mapaGoogleUrl}
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(pais.nombre)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-primary"
                 >
-                  📍 Ver en Google Maps
+                  Ver en Google Maps
                 </a>
 
-                <button
-                  className={`btn-secondary ${esFavorito ? "active-fav" : ""}`}
-                  onClick={() => alAlternarFavorito(pais.cca3)}
-                >
-                  {esFavorito ? "★ Guardado" : "☆ Favorito"}
+                <button className="btn-secondary" onClick={() => alAlternarFavorito(pais.codigo)}>
+                  {esFavorito ? "Guardado" : "Favorito"}
                 </button>
 
-                <button
-                  className="btn-secondary"
-                  onClick={() => alAlternarComparar(pais.cca3)}
-                >
-                  {estaComparando ? "✓ En comparación" : "⚖️ Comparar"}
+                <button className="btn-secondary" onClick={() => alAlternarComparar(pais.codigo)}>
+                  {estaComparando ? "En comparación" : "Comparar"}
                 </button>
               </div>
             </div>
           </div>
 
+          {/* Grilla de datos clave */}
           <div className="modal-info-grid">
             <div className="modal-info-item">
               <span className="label">Capital</span>
@@ -89,49 +77,45 @@ export function ModalPais({ pais, alCerrar, esFavorito, alAlternarFavorito, esta
 
             <div className="modal-info-item">
               <span className="label">Población</span>
-              <span className="val">{formatearNumero(pais.poblacion)} hab.</span>
+              <span className="val">{formatearNumero(pais.poblacion)} habitantes</span>
             </div>
 
             <div className="modal-info-item">
-              <span className="label">Área Superficial</span>
+              <span className="label">Superficie</span>
               <span className="val">{formatearNumero(pais.area)} km²</span>
             </div>
 
             <div className="modal-info-item">
-              <span className="label">Moneda(s)</span>
-              <span className="val">{pais.monedasTexto}</span>
+              <span className="label">Monedas</span>
+              <span className="val">{pais.monedas}</span>
             </div>
 
             <div className="modal-info-item">
-              <span className="label">Idioma(s)</span>
-              <span className="val">{pais.idiomasTexto}</span>
+              <span className="label">Idiomas</span>
+              <span className="val">{pais.idiomas}</span>
             </div>
 
             <div className="modal-info-item">
-              <span className="label">Gentilicio</span>
-              <span className="val">{pais.gentilicio}</span>
-            </div>
-
-            <div className="modal-info-item">
-              <span className="label">Código Alfa-3</span>
-              <span className="val">{pais.cca3}</span>
+              <span className="label">Código País</span>
+              <span className="val">{pais.codigo}</span>
             </div>
           </div>
 
+          {/* Botones de países limítrofes */}
           {pais.fronteras && pais.fronteras.length > 0 && (
             <div className="border-countries-section">
-              <h4>Países Limítrofes / Fronteras ({pais.fronteras.length}):</h4>
+              <h4>Países Fronterizos ({pais.fronteras.length}):</h4>
               <div className="borders-list">
-                {pais.fronteras.map((codigoFrontera) => {
-                  const paisFrontera = mapaPaises[codigoFrontera];
-                  const nombreFrontera = paisFrontera ? (paisFrontera.nombreEspanol || paisFrontera.nombre) : codigoFrontera;
+                {pais.fronteras.map((codigoVecino) => {
+                  const vecino = mapaPaises[codigoVecino];
+                  const nombreVecino = vecino ? vecino.nombre : codigoVecino;
                   return (
                     <button
-                      key={codigoFrontera}
+                      key={codigoVecino}
                       className="border-chip"
-                      onClick={() => paisFrontera && alSeleccionarFrontera(paisFrontera)}
+                      onClick={() => vecino && alSeleccionarFrontera(vecino)}
                     >
-                      {paisFrontera ? `${paisFrontera.banderaEmoji} ${nombreFrontera}` : codigoFrontera}
+                      {nombreVecino}
                     </button>
                   );
                 })}
