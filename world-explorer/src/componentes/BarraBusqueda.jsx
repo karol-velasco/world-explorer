@@ -1,31 +1,34 @@
 import React from "react";
 
+// Componente para buscar y filtrar la lista de países
 export function BarraBusqueda({ busqueda, setBusqueda, regionSeleccionada, setRegionSeleccionada, ordenarPor, setOrdenarPor }) {
   return (
     <div className="controls-section">
+      {/* Campo de Texto para buscar */}
       <div className="search-box">
         <span className="search-icon">🔍</span>
         <input
           type="text"
           className="search-input"
-          placeholder="Buscar por país, capital o código (ej: Colombia, CA, Madrid)..."
+          placeholder="Escribe el nombre de un país o capital..."
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
         />
         {busqueda && (
-          <button className="clear-btn" onClick={() => setBusqueda("")} title="Limpiar búsqueda">
+          <button className="clear-btn" onClick={() => setBusqueda("")}>
             ✕
           </button>
         )}
       </div>
 
+      {/* Selectores de Región y Ordenamiento */}
       <div className="filter-group">
         <select
           className="select-dropdown"
           value={regionSeleccionada}
           onChange={(e) => setRegionSeleccionada(e.target.value)}
         >
-          <option value="all">Todas las Regiones</option>
+          <option value="todos">Todas las Regiones</option>
           <option value="Americas">América</option>
           <option value="Europe">Europa</option>
           <option value="Asia">Asia</option>
@@ -39,10 +42,10 @@ export function BarraBusqueda({ busqueda, setBusqueda, regionSeleccionada, setRe
           value={ordenarPor}
           onChange={(e) => setOrdenarPor(e.target.value)}
         >
-          <option value="name-asc">Nombre (A-Z)</option>
-          <option value="name-desc">Nombre (Z-A)</option>
-          <option value="pop-desc">Mayor Población</option>
-          <option value="pop-asc">Menor Población</option>
+          <option value="nombre-asc">Nombre (A-Z)</option>
+          <option value="nombre-desc">Nombre (Z-A)</option>
+          <option value="poblacion-desc">Mayor Población</option>
+          <option value="poblacion-asc">Menor Población</option>
           <option value="area-desc">Mayor Área (km²)</option>
         </select>
       </div>

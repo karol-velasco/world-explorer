@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { obtenerTodosLosPaises } from "./servicios/servicioPaises";
+import React, { useState, useEffect } from "react";
+import { obtenerPaises } from "./servicios/servicioPaises";
 import { BarraNavegacion } from "./componentes/BarraNavegacion";
 import { ResumenEstadisticas } from "./componentes/ResumenEstadisticas";
 import { BarraBusqueda } from "./componentes/BarraBusqueda";
@@ -8,192 +8,184 @@ import { ModalPais } from "./componentes/ModalPais";
 import { ComparadorPaises } from "./componentes/ComparadorPaises";
 
 export function App() {
-  const [paises, setPaises] = useState([]);
-  const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState(null);
+  // 1. ESTADOS PRINCIPALES DE LA APLICACIÓN
+  const [paises, setPaises] = useState([]); // Lista completa de países descargados
+  const [cargando, setCargando] = useState(true); // Control de pantalla de carga
 
-  // Filtros y Estados
+  // Estados para filtros
   const [busqueda, setBusqueda] = useState("");
-  const [regionSeleccionada, setRegionSeleccionada] = useState("all");
-  const [ordenarPor, setOrdenarPor] = useState("name-asc");
+  const [regionSeleccionada, setRegionSeleccionada] = useState("todos");
+  const [ordenarPor, setOrdenarPor] = useState("nombre-asc");
   const [pestanaActiva, setPestanaActiva] = useState("todos");
 
-  // Selección para Modal
+  // Estado para el modal de detalle del país seleccionado
   const [paisSeleccionado, setPaisSeleccionado] = useState(null);
 
-  // Favoritos y Comparación
+  // Estado para guardar códigos de países favoritos (ej: ["COL", "ESP"])
   const [favoritos, setFavoritos] = useState(() => {
-    try {
-      const guardados = localStorage.getItem("world_explorer_favs");
-      return guardados ? JSON.parse(guardados) : [];
-    } catch {
-      return [];
+    const guardados = localStorage.getItem("favoritos_paises");
+    if (guardados) {
+      return JSON.parse(guardados);
     }
+    return [];
   });
 
-  const [listaComparacion, setListaComparacion] = useState([]);
+  // Estado para comparar países
+  const [comparacion, setComparacion] = useState([]);
 
-  // Tema Claro / Oscuro
-  const [tema, setTema] = useState(() => {
-    return localStorage.getItem("world_explorer_theme") || "dark";
-  });
+  // Estado para el Tema Oscuro / Claro
+  const [tema, setTema] = useState("dark");
 
-  // Aplicar tema al body
+  // 2. EFECTO: Cambiar la apariencia entre claro u oscuro
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", tema);
-    localStorage.setItem("world_explorer_theme", tema);
   }, [tema]);
 
-  const alternarTema = () => {
-    setTema((prev) => (prev === "dark" ? "light" : "dark"));
-  };
-
-  // Guardar favoritos
+  // 3. EFECTO: Guardar favoritos en la memoria del navegador
   useEffect(() => {
-    try {
-      localStorage.setItem("world_explorer_favs", JSON.stringify(favoritos));
-    } catch (err) {
-      console.error("Error al guardar favoritos:", err);
-    }
+    localStorage.setItem("favoritos_paises", JSON.stringify(favoritos));
   }, [favoritos]);
 
-  // Cargar países
+  // 4. EFECTO: Descargar los países al abrir la página
   useEffect(() => {
-    let estaMontado = true;
-    setCargando(true);
-    obtenerTodosLosPaises()
-      .then((datos) => {
-        if (estaMontado) {
-          setPaises(datos);
-          setCargando(false);
-        }
-      })
-      .catch((err) => {
-        if (estaMontado) {
-          setError(err.message || "Error al cargar los datos de los países.");
-          setCargando(false);
-        }
-      });
+    async function cargarDatos() {
+      setCargando(true);
+      const lista = await obtenerPaises();
+      setPaises(lista);
+      setCargando(false);
+    }
 
-    return () => {
-      estaMontado = false;
-    };
+    cargarDatos();
   }, []);
 
-  // Diccionario para búsqueda rápida por cca3
-  const mapaPaises = useMemo(() => {
-    const map = {};
-    paises.forEach((p) => {
-      if (p.cca3) map[p.cca3] = p;
-    });
-    return map;
-  }, [paises]);
-
-  // Alternar Favorito
-  const alternarFavorito = (cca3) => {
-    setFavoritos((prev) =>
-      prev.includes(cca3) ? prev.filter((id) => id !== cca3) : [...prev, cca3]
-    );
+  // 5. FUNCIONES PARA MANEJAR FAVORITOS Y COMPARACIÓN
+  const alternarFavorito = (codigo) => {
+    if (favoritos.includes(codigo)) {
+      // Si ya está, lo quitamos
+      const nuevaLista = favoritos.filter((c) => c !== codigo);
+      setFavoritos(nuevaLista);
+    } else {
+      // Si no está, lo agregamos
+      setFavoritos([...favoritos, codigo]);
+    }
   };
 
-  // Alternar Comparación
-  const alternarComparar = (cca3) => {
-    setListaComparacion((prev) =>
-      prev.includes(cca3) ? prev.filter((id) => id !== cca3) : [...prev, cca3]
-    );
+  const alternarComparar = (codigo) => {
+    if (comparacion.includes(codigo)) {
+      setComparacion(comparacion.filter((c) => c !== codigo));
+    } else {
+      setComparacion([...comparacion, codigo]);
+    }
   };
 
-  // Lista de países filtrados y ordenados
-  const paisesProcesados = useMemo(() => {
-    let lista = paises;
-
-    // Filtro por pestaña
-    if (pestanaActiva === "favoritos") {
-      lista = lista.filter((p) => favoritos.includes(p.cca3));
+  const alternarTema = () => {
+    if (tema === "dark") {
+      setTema("light");
+    } else {
+      setTema("dark");
     }
+  };
 
-    // Filtro por región
-    if (regionSeleccionada !== "all") {
-      lista = lista.filter((p) => p.region === regionSeleccionada);
-    }
+  // 6. MAPA DE BÚSQUEDA RÁPIDA (para encontrar un país por su código)
+  const mapaPaises = {};
+  for (let i = 0; i < paises.length; i++) {
+    const p = paises[i];
+    mapaPaises[p.codigo] = p;
+  }
 
-    // Filtro por término de búsqueda
-    if (busqueda.trim()) {
-      const q = busqueda.toLowerCase().trim();
-      lista = lista.filter((p) => {
-        const nombre = (p.nombreEspanol || p.nombre).toLowerCase();
-        const nomOrig = p.nombre.toLowerCase();
-        const capital = p.capital.toLowerCase();
-        const cca3 = p.cca3.toLowerCase();
-        const cca2 = p.cca2.toLowerCase();
-        return (
-          nombre.includes(q) ||
-          nomOrig.includes(q) ||
-          capital.includes(q) ||
-          cca3.includes(q) ||
-          cca2.includes(q)
-        );
-      });
-    }
+  // 7. FILTRAR Y ORDENAR PAÍSES DE MANERA SENCILLA
+  let paisesFiltrados = paises;
 
-    // Ordenamiento
-    return [...lista].sort((a, b) => {
-      if (ordenarPor === "name-asc") {
-        return (a.nombreEspanol || a.nombre).localeCompare(b.nombreEspanol || b.nombre, "es");
-      }
-      if (ordenarPor === "name-desc") {
-        return (b.nombreEspanol || b.nombre).localeCompare(a.nombreEspanol || a.nombre, "es");
-      }
-      if (ordenarPor === "pop-desc") {
-        return b.poblacion - a.poblacion;
-      }
-      if (ordenarPor === "pop-asc") {
-        return a.poblacion - b.poblacion;
-      }
-      if (ordenarPor === "area-desc") {
-        return b.area - a.area;
-      }
-      return 0;
+  // Filtrar si estamos en la pestaña de Favoritos
+  if (pestanaActiva === "favoritos") {
+    paisesFiltrados = paisesFiltrados.filter((p) => favoritos.includes(p.codigo));
+  }
+
+  // Filtrar por Región / Continente
+  if (regionSeleccionada !== "todos") {
+    paisesFiltrados = paisesFiltrados.filter((p) => p.region === regionSeleccionada);
+  }
+
+  // Filtrar por Texto de búsqueda
+  if (busqueda.trim() !== "") {
+    const texto = busqueda.toLowerCase().trim();
+    paisesFiltrados = paisesFiltrados.filter((p) => {
+      const nomEspanol = p.nombre.toLowerCase();
+      const nomIngles = p.nombreOriginal.toLowerCase();
+      const capital = p.capital.toLowerCase();
+      const cod = p.codigo.toLowerCase();
+      return nomEspanol.includes(texto) || nomIngles.includes(texto) || capital.includes(texto) || cod.includes(texto);
     });
-  }, [paises, pestanaActiva, favoritos, regionSeleccionada, busqueda, ordenarPor]);
+  }
 
-  // Población mundial total
-  const poblacionMundialTotal = useMemo(() => {
-    return paises.reduce((suma, p) => suma + p.poblacion, 0);
-  }, [paises]);
+  // Ordenar la lista según la opción elegida
+  paisesFiltrados.sort((a, b) => {
+    if (ordenarPor === "nombre-asc") {
+      return a.nombre.localeCompare(b.nombre, "es");
+    }
+    if (ordenarPor === "nombre-desc") {
+      return b.nombre.localeCompare(a.nombre, "es");
+    }
+    if (ordenarPor === "poblacion-desc") {
+      return b.poblacion - a.poblacion;
+    }
+    if (ordenarPor === "poblacion-asc") {
+      return a.poblacion - b.poblacion;
+    }
+    if (ordenarPor === "area-desc") {
+      return b.area - a.area;
+    }
+    return 0;
+  });
 
-  const objetosPaisesComparacion = useMemo(() => {
-    return listaComparacion.map((codigo) => mapaPaises[codigo]).filter(Boolean);
-  }, [listaComparacion, mapaPaises]);
+  // Calcular la suma de la población de los países mostrados
+  let poblacionTotalSumada = 0;
+  for (let i = 0; i < paises.length; i++) {
+    poblacionTotalSumada += paises[i].poblacion;
+  }
 
+  // Crear la lista de objetos completos para comparar
+  const listaComparacionObjetos = [];
+  for (let i = 0; i < comparacion.length; i++) {
+    const cod = comparacion[i];
+    if (mapaPaises[cod]) {
+      listaComparacionObjetos.push(mapaPaises[cod]);
+    }
+  }
+
+  // 8. RENDERIZADO DEL COMPONENTE PRINCIPAL
   return (
     <div className="app-layout">
+      {/* Barra Superior */}
       <BarraNavegacion
         pestanaActiva={pestanaActiva}
         setPestanaActiva={setPestanaActiva}
         tema={tema}
         alternarTema={alternarTema}
         conteoFavoritos={favoritos.length}
-        conteoComparar={listaComparacion.length}
+        conteoComparar={comparacion.length}
       />
 
       <main className="main-content">
+        {/* Banner de Tarjetas Resumen */}
         <ResumenEstadisticas
           totalPaises={paises.length}
-          conteoFiltrados={paisesProcesados.length}
-          poblacionTotal={poblacionMundialTotal}
+          conteoFiltrados={paisesFiltrados.length}
+          poblacionTotal={poblacionTotalSumada}
           conteoFavoritos={favoritos.length}
         />
 
+        {/* Vista de Comparación o Lista Principal */}
         {pestanaActiva === "comparar" ? (
           <ComparadorPaises
-            listaComparacion={objetosPaisesComparacion}
+            listaComparacion={listaComparacionObjetos}
             alRemoverComparacion={alternarComparar}
-            alLimpiarTodo={() => setListaComparacion([])}
+            alLimpiarTodo={() => setComparacion([])}
             alSeleccionarPais={(p) => setPaisSeleccionado(p)}
           />
         ) : (
           <>
+            {/* Controles de Búsqueda y Filtros */}
             <BarraBusqueda
               busqueda={busqueda}
               setBusqueda={setBusqueda}
@@ -203,52 +195,33 @@ export function App() {
               setOrdenarPor={setOrdenarPor}
             />
 
+            {/* Mensaje de Carga */}
             {cargando && (
-              <div className="loading-state glass-panel" style={{ borderRadius: "var(--radius-lg)" }}>
+              <div className="loading-state glass-panel">
                 <div className="spinner"></div>
-                <h3>Cargando información geográfica del mundo...</h3>
-                <p style={{ color: "var(--text-muted)" }}>Obteniendo datos de REST Countries API</p>
+                <h3>Cargando lista de países...</h3>
               </div>
             )}
 
-            {error && (
-              <div className="empty-state glass-panel" style={{ borderRadius: "var(--radius-lg)" }}>
-                <div style={{ fontSize: "3rem" }}>⚠️</div>
-                <h3>No se pudo cargar la información</h3>
-                <p style={{ color: "var(--danger-color)" }}>{error}</p>
-                <button className="btn-primary" onClick={() => window.location.reload()}>
-                  Reintentar
-                </button>
-              </div>
-            )}
-
-            {!cargando && !error && paisesProcesados.length === 0 && (
-              <div className="empty-state glass-panel" style={{ borderRadius: "var(--radius-lg)" }}>
-                <div style={{ fontSize: "3rem" }}>🔍</div>
+            {/* Si no hay resultados */}
+            {!cargando && paisesFiltrados.length === 0 && (
+              <div className="empty-state glass-panel">
                 <h3>No se encontraron países</h3>
-                <p style={{ color: "var(--text-muted)" }}>
-                  {pestanaActiva === "favoritos"
-                    ? "Aún no has guardado países en tus favoritos. Haz clic en el ícono ⭐ de cualquier tarjeta."
-                    : "Intenta cambiar los términos de búsqueda o el filtro de región."}
-                </p>
-                {busqueda && (
-                  <button className="btn-secondary" onClick={() => setBusqueda("")}>
-                    Limpiar Búsqueda
-                  </button>
-                )}
+                <p>Intenta cambiar la búsqueda o el filtro.</p>
               </div>
             )}
 
-            {!cargando && !error && paisesProcesados.length > 0 && (
+            {/* Grilla de Tarjetas de Países */}
+            {!cargando && paisesFiltrados.length > 0 && (
               <div className="countries-grid">
-                {paisesProcesados.map((pais) => (
+                {paisesFiltrados.map((pais) => (
                   <TarjetaPais
-                    key={pais.cca3 || pais.nombre}
+                    key={pais.codigo}
                     pais={pais}
                     alSeleccionar={(p) => setPaisSeleccionado(p)}
-                    esFavorito={favoritos.includes(pais.cca3)}
+                    esFavorito={favoritos.includes(pais.codigo)}
                     alAlternarFavorito={alternarFavorito}
-                    estaComparando={listaComparacion.includes(pais.cca3)}
+                    estaComparando={comparacion.includes(pais.codigo)}
                     alAlternarComparar={alternarComparar}
                   />
                 ))}
@@ -258,19 +231,20 @@ export function App() {
         )}
       </main>
 
+      {/* Ventana Modal de Detalle */}
       <ModalPais
         pais={paisSeleccionado}
         alCerrar={() => setPaisSeleccionado(null)}
-        esFavorito={paisSeleccionado ? favoritos.includes(paisSeleccionado.cca3) : false}
+        esFavorito={paisSeleccionado ? favoritos.includes(paisSeleccionado.codigo) : false}
         alAlternarFavorito={alternarFavorito}
-        estaComparando={paisSeleccionado ? listaComparacion.includes(paisSeleccionado.cca3) : false}
+        estaComparando={paisSeleccionado ? comparacion.includes(paisSeleccionado.codigo) : false}
         alAlternarComparar={alternarComparar}
         mapaPaises={mapaPaises}
-        alSeleccionarFrontera={(paisFrontera) => setPaisSeleccionado(paisFrontera)}
+        alSeleccionarFrontera={(vecino) => setPaisSeleccionado(vecino)}
       />
 
       <footer className="footer">
-        World Explorer &copy; {new Date().getFullYear()} — Desarrollado con React 19 & REST Countries API
+        World Explorer — Proyecto de Aprendizaje React
       </footer>
     </div>
   );
