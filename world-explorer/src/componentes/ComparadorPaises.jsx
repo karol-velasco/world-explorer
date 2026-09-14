@@ -1,8 +1,8 @@
 import React from "react";
-import { formatNumber } from "../services/countryService";
+import { formatearNumero } from "../servicios/servicioPaises";
 
-export function CountryCompare({ compareList, onRemoveCompare, onClearAll, onSelectCountry }) {
-  if (compareList.length === 0) {
+export function ComparadorPaises({ listaComparacion, alRemoverComparacion, alLimpiarTodo, alSeleccionarPais }) {
+  if (listaComparacion.length === 0) {
     return (
       <div className="empty-state glass-panel">
         <div style={{ fontSize: "3rem" }}>⚖️</div>
@@ -17,35 +17,35 @@ export function CountryCompare({ compareList, onRemoveCompare, onClearAll, onSel
   return (
     <div style={{ marginTop: "12px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-        <h2>Comparando {compareList.length} País(es)</h2>
-        <button className="btn-secondary" onClick={onClearAll}>
+        <h2>Comparando {listaComparacion.length} País(es)</h2>
+        <button className="btn-secondary" onClick={alLimpiarTodo}>
           Limpiar comparación
         </button>
       </div>
 
       <div className="compare-container">
-        {compareList.map((c) => {
-          const density = c.area > 0 ? (c.population / c.area).toFixed(1) : "N/A";
-          const displayName = c.spanishName || c.name;
+        {listaComparacion.map((c) => {
+          const densidad = c.area > 0 ? (c.poblacion / c.area).toFixed(1) : "N/A";
+          const nombreMostrar = c.nombreEspanol || c.nombre;
 
           return (
             <div key={c.cca3} className="compare-card glass-panel">
               <button
                 className="remove-compare-btn"
-                onClick={() => onRemoveCompare(c.cca3)}
+                onClick={() => alRemoverComparacion(c.cca3)}
                 title="Quitar"
               >
                 ✕
               </button>
 
               <img
-                src={c.flagPng}
-                alt={`Bandera de ${displayName}`}
+                src={c.banderaPng}
+                alt={`Bandera de ${nombreMostrar}`}
                 style={{ width: "80px", height: "54px", objectFit: "cover", borderRadius: "6px", marginBottom: "12px", boxShadow: "var(--shadow-sm)" }}
               />
 
-              <h3 style={{ fontSize: "1.1rem", marginBottom: "4px", cursor: "pointer" }} onClick={() => onSelectCountry(c)}>
-                {displayName}
+              <h3 style={{ fontSize: "1.1rem", marginBottom: "4px", cursor: "pointer" }} onClick={() => alSeleccionarPais(c)}>
+                {nombreMostrar}
               </h3>
               <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginBottom: "16px" }}>{c.capital}</div>
 
@@ -57,27 +57,27 @@ export function CountryCompare({ compareList, onRemoveCompare, onClearAll, onSel
 
                 <div className="modal-info-item">
                   <span className="label">Población</span>
-                  <span className="val">{formatNumber(c.population)} hab.</span>
+                  <span className="val">{formatearNumero(c.poblacion)} hab.</span>
                 </div>
 
                 <div className="modal-info-item">
                   <span className="label">Área</span>
-                  <span className="val">{formatNumber(c.area)} km²</span>
+                  <span className="val">{formatearNumero(c.area)} km²</span>
                 </div>
 
                 <div className="modal-info-item">
                   <span className="label">Densidad Pob.</span>
-                  <span className="val">{density} hab/km²</span>
+                  <span className="val">{densidad} hab/km²</span>
                 </div>
 
                 <div className="modal-info-item">
                   <span className="label">Moneda</span>
-                  <span className="val">{c.currenciesStr}</span>
+                  <span className="val">{c.monedasTexto}</span>
                 </div>
 
                 <div className="modal-info-item">
                   <span className="label">Idiomas</span>
-                  <span className="val">{c.languagesStr}</span>
+                  <span className="val">{c.idiomasTexto}</span>
                 </div>
               </div>
             </div>

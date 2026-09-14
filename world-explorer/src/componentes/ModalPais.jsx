@@ -1,15 +1,15 @@
 import React from "react";
-import { formatNumber } from "../services/countryService";
+import { formatearNumero } from "../servicios/servicioPaises";
 
-export function CountryModal({ country, onClose, isFavorite, onToggleFavorite, isComparing, onToggleCompare, allCountriesMap, onSelectBorder }) {
-  if (!country) return null;
+export function ModalPais({ pais, alCerrar, esFavorito, alAlternarFavorito, estaComparando, alAlternarComparar, mapaPaises, alSeleccionarFrontera }) {
+  if (!pais) return null;
 
-  const displayName = country.spanishName || country.name;
+  const nombreMostrar = pais.nombreEspanol || pais.nombre;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={alCerrar}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close-btn" onClick={onClose} title="Cerrar (Esc)">
+        <button className="modal-close-btn" onClick={alCerrar} title="Cerrar (Esc)">
           ✕
         </button>
 
@@ -17,14 +17,14 @@ export function CountryModal({ country, onClose, isFavorite, onToggleFavorite, i
           <div className="modal-header-grid">
             <div>
               <img
-                src={country.flagSvg || country.flagPng}
-                alt={`Bandera de ${displayName}`}
+                src={pais.banderaSvg || pais.banderaPng}
+                alt={`Bandera de ${nombreMostrar}`}
                 className="modal-flag-img"
               />
-              {country.coatOfArms && (
+              {pais.escudo && (
                 <div style={{ marginTop: "16px", textAlign: "center" }}>
                   <img
-                    src={country.coatOfArms}
+                    src={pais.escudo}
                     alt="Escudo de armas"
                     style={{ height: "60px", objectFit: "contain" }}
                   />
@@ -34,20 +34,20 @@ export function CountryModal({ country, onClose, isFavorite, onToggleFavorite, i
             </div>
 
             <div className="modal-info-main">
-              <h2 className="modal-country-name">{displayName}</h2>
-              <div className="modal-country-official">{country.officialName}</div>
+              <h2 className="modal-country-name">{nombreMostrar}</h2>
+              <div className="modal-country-official">{pais.nombreOficial}</div>
 
               <div className="modal-badge-group">
-                <span className="region-badge">{country.region}</span>
+                <span className="region-badge">{pais.region}</span>
                 <span className="region-badge" style={{ background: "rgba(16, 185, 129, 0.12)", color: "#10b981" }}>
-                  {country.subregion}
+                  {pais.subregion}
                 </span>
-                {country.landlocked && (
+                {pais.sinSalidaMar && (
                   <span className="region-badge" style={{ background: "rgba(245, 158, 11, 0.12)", color: "#f59e0b" }}>
                     🔒 Sin salida al mar
                   </span>
                 )}
-                {country.unMember && (
+                {pais.miembroOnu && (
                   <span className="region-badge" style={{ background: "rgba(59, 130, 246, 0.12)", color: "#3b82f6" }}>
                     🇺🇳 Miembro ONU
                   </span>
@@ -56,7 +56,7 @@ export function CountryModal({ country, onClose, isFavorite, onToggleFavorite, i
 
               <div className="modal-actions-bar">
                 <a
-                  href={country.mapsUrl}
+                  href={pais.mapaGoogleUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-primary"
@@ -65,17 +65,17 @@ export function CountryModal({ country, onClose, isFavorite, onToggleFavorite, i
                 </a>
 
                 <button
-                  className={`btn-secondary ${isFavorite ? "active-fav" : ""}`}
-                  onClick={() => onToggleFavorite(country.cca3)}
+                  className={`btn-secondary ${esFavorito ? "active-fav" : ""}`}
+                  onClick={() => alAlternarFavorito(pais.cca3)}
                 >
-                  {isFavorite ? "★ Guardado" : "☆ Favorito"}
+                  {esFavorito ? "★ Guardado" : "☆ Favorito"}
                 </button>
 
                 <button
                   className="btn-secondary"
-                  onClick={() => onToggleCompare(country.cca3)}
+                  onClick={() => alAlternarComparar(pais.cca3)}
                 >
-                  {isComparing ? "✓ En comparación" : "⚖️ Comparar"}
+                  {estaComparando ? "✓ En comparación" : "⚖️ Comparar"}
                 </button>
               </div>
             </div>
@@ -84,54 +84,54 @@ export function CountryModal({ country, onClose, isFavorite, onToggleFavorite, i
           <div className="modal-info-grid">
             <div className="modal-info-item">
               <span className="label">Capital</span>
-              <span className="val">{country.capital}</span>
+              <span className="val">{pais.capital}</span>
             </div>
 
             <div className="modal-info-item">
               <span className="label">Población</span>
-              <span className="val">{formatNumber(country.population)} hab.</span>
+              <span className="val">{formatearNumero(pais.poblacion)} hab.</span>
             </div>
 
             <div className="modal-info-item">
               <span className="label">Área Superficial</span>
-              <span className="val">{formatNumber(country.area)} km²</span>
+              <span className="val">{formatearNumero(pais.area)} km²</span>
             </div>
 
             <div className="modal-info-item">
               <span className="label">Moneda(s)</span>
-              <span className="val">{country.currenciesStr}</span>
+              <span className="val">{pais.monedasTexto}</span>
             </div>
 
             <div className="modal-info-item">
               <span className="label">Idioma(s)</span>
-              <span className="val">{country.languagesStr}</span>
+              <span className="val">{pais.idiomasTexto}</span>
             </div>
 
             <div className="modal-info-item">
               <span className="label">Gentilicio</span>
-              <span className="val">{country.demonym}</span>
+              <span className="val">{pais.gentilicio}</span>
             </div>
 
             <div className="modal-info-item">
               <span className="label">Código Alfa-3</span>
-              <span className="val">{country.cca3}</span>
+              <span className="val">{pais.cca3}</span>
             </div>
           </div>
 
-          {country.borders && country.borders.length > 0 && (
+          {pais.fronteras && pais.fronteras.length > 0 && (
             <div className="border-countries-section">
-              <h4>Países Limítrofes / Fronteras ({country.borders.length}):</h4>
+              <h4>Países Limítrofes / Fronteras ({pais.fronteras.length}):</h4>
               <div className="borders-list">
-                {country.borders.map((bCode) => {
-                  const borderCountry = allCountriesMap[bCode];
-                  const borderName = borderCountry ? (borderCountry.spanishName || borderCountry.name) : bCode;
+                {pais.fronteras.map((codigoFrontera) => {
+                  const paisFrontera = mapaPaises[codigoFrontera];
+                  const nombreFrontera = paisFrontera ? (paisFrontera.nombreEspanol || paisFrontera.nombre) : codigoFrontera;
                   return (
                     <button
-                      key={bCode}
+                      key={codigoFrontera}
                       className="border-chip"
-                      onClick={() => borderCountry && onSelectBorder(borderCountry)}
+                      onClick={() => paisFrontera && alSeleccionarFrontera(paisFrontera)}
                     >
-                      {borderCountry ? `${borderCountry.flagEmoji} ${borderName}` : bCode}
+                      {paisFrontera ? `${paisFrontera.banderaEmoji} ${nombreFrontera}` : codigoFrontera}
                     </button>
                   );
                 })}

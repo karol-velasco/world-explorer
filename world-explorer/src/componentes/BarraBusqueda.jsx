@@ -1,6 +1,6 @@
 import React from "react";
 
-export function SearchBar({ search, setSearch, selectedRegion, setSelectedRegion, sortBy, setSortBy }) {
+export function BarraBusqueda({ busqueda, setBusqueda, regionSeleccionada, setRegionSeleccionada, ordenarPor, setOrdenarPor }) {
   return (
     <div className="controls-section">
       <div className="search-box">
@@ -9,11 +9,11 @@ export function SearchBar({ search, setSearch, selectedRegion, setSelectedRegion
           type="text"
           className="search-input"
           placeholder="Buscar por país, capital o código (ej: Colombia, CA, Madrid)..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
         />
-        {search && (
-          <button className="clear-btn" onClick={() => setSearch("")} title="Limpiar búsqueda">
+        {busqueda && (
+          <button className="clear-btn" onClick={() => setBusqueda("")} title="Limpiar búsqueda">
             ✕
           </button>
         )}
@@ -22,8 +22,8 @@ export function SearchBar({ search, setSearch, selectedRegion, setSelectedRegion
       <div className="filter-group">
         <select
           className="select-dropdown"
-          value={selectedRegion}
-          onChange={(e) => setSelectedRegion(e.target.value)}
+          value={regionSeleccionada}
+          onChange={(e) => setRegionSeleccionada(e.target.value)}
         >
           <option value="all">Todas las Regiones</option>
           <option value="Americas">América</option>
@@ -36,8 +36,8 @@ export function SearchBar({ search, setSearch, selectedRegion, setSelectedRegion
 
         <select
           className="select-dropdown"
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
+          value={ordenarPor}
+          onChange={(e) => setOrdenarPor(e.target.value)}
         >
           <option value="name-asc">Nombre (A-Z)</option>
           <option value="name-desc">Nombre (Z-A)</option>
