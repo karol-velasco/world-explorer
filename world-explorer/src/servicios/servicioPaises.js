@@ -14,7 +14,7 @@ export async function obtenerPaises() {
     const respuestaPoblacion = await fetch(URL_DR5HN);
     const datosPoblacion = await respuestaPoblacion.json();
 
-    // Guardamos la población de cada país en un objeto sencillo usando su código (ej: "COL" -> 53057212)
+    // Guardamos la población de cada país en un objeto sencillo usando su código
     const mapaPoblacion = {};
     for (let i = 0; i < datosPoblacion.length; i++) {
       const item = datosPoblacion[i];
@@ -27,13 +27,13 @@ export async function obtenerPaises() {
     const respuestaPaises = await fetch(URL_MLEDOZE);
     const listaRaw = await respuestaPaises.json();
 
-    // 3. Transformamos cada país a una estructura súper fácil de entender
+    // 3. Transformamos cada país a una estructura fácil de entender
     const listaPaisesFinal = [];
 
     for (let i = 0; i < listaRaw.length; i++) {
       const p = listaRaw[i];
 
-      // Código del país (ej: COL, ESP, MEX)
+      // Código del país
       const codigo = p.cca3 || p.cca2 || "S/N";
       const codigoDosLetras = (p.cca2 || "").toLowerCase();
 
@@ -42,25 +42,25 @@ export async function obtenerPaises() {
       const nombreEspanol = p.translations?.spa?.common || nombreIngles;
       const nombreOficial = p.translations?.spa?.official || nombreIngles;
 
-      // Capital (si tiene varias, tomamos la primera o ponemos 'No tiene')
+      // Capital
       let capital = "Sin capital";
       if (p.capital && p.capital.length > 0) {
         capital = p.capital[0];
       }
 
-      // Población (si no viene en el archivo principal, la sacamos del mapa de población)
+      // Población
       let poblacion = p.population;
       if (!poblacion && mapaPoblacion[codigo]) {
         poblacion = mapaPoblacion[codigo];
       }
       if (!poblacion) {
-        poblacion = 0; // Si no hay datos, ponemos 0
+        poblacion = 0;
       }
 
       // Superficie / Área en km²
       const area = p.area || 0;
 
-      // Región y Subregión (ej: Americas, Europe)
+      // Región y Subregión
       const region = p.region || "Otros";
       const subregion = p.subregion || region;
 
@@ -70,13 +70,13 @@ export async function obtenerPaises() {
       // Escudo de armas
       const escudo = p.coatOfArms?.png || null;
 
-      // Idiomas (los unimos con comas)
+      // Idiomas
       let idiomas = "No especificado";
       if (p.languages) {
         idiomas = Object.values(p.languages).join(", ");
       }
 
-      // Monedas (las unimos con comas)
+      // Monedas
       let monedas = "No especificado";
       if (p.currencies) {
         const listaMonedas = [];
@@ -88,7 +88,7 @@ export async function obtenerPaises() {
         monedas = listaMonedas.join(", ");
       }
 
-      // Fronteras (lista de códigos de países vecinos)
+      // Fronteras
       const fronteras = p.borders || [];
 
       // Creamos el objeto limpio de este país
@@ -122,7 +122,7 @@ export async function obtenerPaises() {
   }
 }
 
-// Función sencilla para formatear números largos (ej: 50000000 -> 50.000.000)
+// Función sencilla para formatear números largos
 export function formatearNumero(numero) {
   if (!numero) return "0";
   return numero.toLocaleString("es-CO");

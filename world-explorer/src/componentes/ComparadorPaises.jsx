@@ -6,10 +6,9 @@ export function ComparadorPaises({ listaComparacion, alRemoverComparacion, alLim
   if (listaComparacion.length === 0) {
     return (
       <div className="empty-state glass-panel">
-        <div style={{ fontSize: "3rem" }}>⚖️</div>
         <h2>Comparador Vacío</h2>
         <p style={{ color: "var(--text-muted)" }}>
-          Agrega países a la lista usando el botón de la báscula (⚖️) en cada tarjeta para compararlos.
+          Agrega países a la lista usando el botón "+Comp" en cada tarjeta para compararlos.
         </p>
       </div>
     );

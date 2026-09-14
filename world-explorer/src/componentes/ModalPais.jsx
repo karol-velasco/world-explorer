@@ -37,12 +37,12 @@ export function ModalPais({ pais, alCerrar, esFavorito, alAlternarFavorito, esta
                 </span>
                 {pais.sinSalidaMar && (
                   <span className="region-badge" style={{ background: "rgba(245, 158, 11, 0.12)", color: "#f59e0b" }}>
-                    🔒 Sin salida al mar
+                    Sin salida al mar
                   </span>
                 )}
                 {pais.miembroOnu && (
                   <span className="region-badge" style={{ background: "rgba(59, 130, 246, 0.12)", color: "#3b82f6" }}>
-                    🇺🇳 Miembro ONU
+                    Miembro ONU
                   </span>
                 )}
               </div>
@@ -54,15 +54,15 @@ export function ModalPais({ pais, alCerrar, esFavorito, alAlternarFavorito, esta
                   rel="noopener noreferrer"
                   className="btn-primary"
                 >
-                  📍 Ver en Google Maps
+                  Ver en Google Maps
                 </a>
 
                 <button className="btn-secondary" onClick={() => alAlternarFavorito(pais.codigo)}>
-                  {esFavorito ? "★ Guardado" : "☆ Favorito"}
+                  {esFavorito ? "Guardado" : "Favorito"}
                 </button>
 
                 <button className="btn-secondary" onClick={() => alAlternarComparar(pais.codigo)}>
-                  {estaComparando ? "✓ En comparación" : "⚖️ Comparar"}
+                  {estaComparando ? "En comparación" : "Comparar"}
                 </button>
               </div>
             </div>

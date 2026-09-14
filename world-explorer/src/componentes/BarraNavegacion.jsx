@@ -5,9 +5,9 @@ export function BarraNavegacion({ pestanaActiva, setPestanaActiva, tema, alterna
   return (
     <nav className="navbar glass-panel">
       <div className="navbar-container">
-        {/* Título de la app */}
+        {/* Título de la aplicación */}
         <div className="brand-logo" onClick={() => setPestanaActiva("todos")}>
-          <div className="brand-icon">🌐</div>
+          <div className="brand-icon">WE</div>
           <div>
             <h1 className="brand-title">World Explorer</h1>
           </div>
@@ -20,26 +20,26 @@ export function BarraNavegacion({ pestanaActiva, setPestanaActiva, tema, alterna
               className={`tab-btn ${pestanaActiva === "todos" ? "active" : ""}`}
               onClick={() => setPestanaActiva("todos")}
             >
-              <span>🌍</span> Todos
+              Todos
             </button>
 
             <button
               className={`tab-btn ${pestanaActiva === "favoritos" ? "active" : ""}`}
               onClick={() => setPestanaActiva("favoritos")}
             >
-              <span>⭐</span> Favoritos ({conteoFavoritos})
+              Favoritos ({conteoFavoritos})
             </button>
 
             <button
               className={`tab-btn ${pestanaActiva === "comparar" ? "active" : ""}`}
               onClick={() => setPestanaActiva("comparar")}
             >
-              <span>⚖️</span> Comparar ({conteoComparar})
+              Comparar ({conteoComparar})
             </button>
           </div>
 
           <button className="theme-toggle-btn" onClick={alternarTema}>
-            {tema === "dark" ? "☀️" : "🌙"}
+            {tema === "dark" ? "Modo Claro" : "Modo Oscuro"}
           </button>
         </div>
       </div>

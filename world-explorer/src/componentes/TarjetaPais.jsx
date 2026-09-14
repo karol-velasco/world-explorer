@@ -16,22 +16,24 @@ export function TarjetaPais({ pais, alSeleccionar, esFavorito, alAlternarFavorit
 
         {/* Botones rápidos arriba de la tarjeta */}
         <div className="card-top-actions" onClick={(e) => e.stopPropagation()}>
-          {/* Botón de Favorito ⭐ */}
+          {/* Botón de Favorito */}
           <button
             className={`action-icon-btn ${esFavorito ? "active-fav" : ""}`}
             onClick={() => alAlternarFavorito(pais.codigo)}
             title="Guardar en favoritos"
+            style={{ width: "auto", padding: "0 8px", fontSize: "0.75rem" }}
           >
-            {esFavorito ? "★" : "☆"}
+            {esFavorito ? "Guardado" : "+Fav"}
           </button>
 
-          {/* Botón de Comparar ⚖️ */}
+          {/* Botón de Comparar */}
           <button
             className={`action-icon-btn ${estaComparando ? "active-compare" : ""}`}
             onClick={() => alAlternarComparar(pais.codigo)}
             title="Añadir a comparación"
+            style={{ width: "auto", padding: "0 8px", fontSize: "0.75rem" }}
           >
-            ⚖️
+            {estaComparando ? "En Comp." : "+Comp"}
           </button>
         </div>
       </div>

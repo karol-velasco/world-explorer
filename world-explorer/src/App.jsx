@@ -7,10 +7,14 @@ import { TarjetaPais } from "./componentes/TarjetaPais";
 import { ModalPais } from "./componentes/ModalPais";
 import { ComparadorPaises } from "./componentes/ComparadorPaises";
 
+// URLs de los videos de fondo proporcionados
+const VIDEO_SOL_MODO_CLARO = "https://www.gstatic.com/culturalinstitute/searchar/assets/sun/desktop_dark.mp4";
+const VIDEO_LUNA_MODO_OSCURO = "https://www.gstatic.com/culturalinstitute/searchar/assets/earths_moon/desktop_dark.mp4";
+
 export function App() {
   // 1. ESTADOS PRINCIPALES DE LA APLICACIÓN
-  const [paises, setPaises] = useState([]); // Lista completa de países descargados
-  const [cargando, setCargando] = useState(true); // Control de pantalla de carga
+  const [paises, setPaises] = useState([]);
+  const [cargando, setCargando] = useState(true);
 
   // Estados para filtros
   const [busqueda, setBusqueda] = useState("");
@@ -21,7 +25,7 @@ export function App() {
   // Estado para el modal de detalle del país seleccionado
   const [paisSeleccionado, setPaisSeleccionado] = useState(null);
 
-  // Estado para guardar códigos de países favoritos (ej: ["COL", "ESP"])
+  // Estado para guardar códigos de países favoritos
   const [favoritos, setFavoritos] = useState(() => {
     const guardados = localStorage.getItem("favoritos_paises");
     if (guardados) {
@@ -33,7 +37,7 @@ export function App() {
   // Estado para comparar países
   const [comparacion, setComparacion] = useState([]);
 
-  // Estado para el Tema Oscuro / Claro
+  // Estado para el Tema (Claro / Oscuro)
   const [tema, setTema] = useState("dark");
 
   // 2. EFECTO: Cambiar la apariencia entre claro u oscuro
@@ -61,11 +65,9 @@ export function App() {
   // 5. FUNCIONES PARA MANEJAR FAVORITOS Y COMPARACIÓN
   const alternarFavorito = (codigo) => {
     if (favoritos.includes(codigo)) {
-      // Si ya está, lo quitamos
       const nuevaLista = favoritos.filter((c) => c !== codigo);
       setFavoritos(nuevaLista);
     } else {
-      // Si no está, lo agregamos
       setFavoritos([...favoritos, codigo]);
     }
   };
@@ -86,7 +88,7 @@ export function App() {
     }
   };
 
-  // 6. MAPA DE BÚSQUEDA RÁPIDA (para encontrar un país por su código)
+  // 6. MAPA DE BÚSQUEDA RÁPIDA
   const mapaPaises = {};
   for (let i = 0; i < paises.length; i++) {
     const p = paises[i];
@@ -96,17 +98,14 @@ export function App() {
   // 7. FILTRAR Y ORDENAR PAÍSES DE MANERA SENCILLA
   let paisesFiltrados = paises;
 
-  // Filtrar si estamos en la pestaña de Favoritos
   if (pestanaActiva === "favoritos") {
     paisesFiltrados = paisesFiltrados.filter((p) => favoritos.includes(p.codigo));
   }
 
-  // Filtrar por Región / Continente
   if (regionSeleccionada !== "todos") {
     paisesFiltrados = paisesFiltrados.filter((p) => p.region === regionSeleccionada);
   }
 
-  // Filtrar por Texto de búsqueda
   if (busqueda.trim() !== "") {
     const texto = busqueda.toLowerCase().trim();
     paisesFiltrados = paisesFiltrados.filter((p) => {
@@ -118,7 +117,6 @@ export function App() {
     });
   }
 
-  // Ordenar la lista según la opción elegida
   paisesFiltrados.sort((a, b) => {
     if (ordenarPor === "nombre-asc") {
       return a.nombre.localeCompare(b.nombre, "es");
@@ -138,13 +136,11 @@ export function App() {
     return 0;
   });
 
-  // Calcular la suma de la población de los países mostrados
   let poblacionTotalSumada = 0;
   for (let i = 0; i < paises.length; i++) {
     poblacionTotalSumada += paises[i].poblacion;
   }
 
-  // Crear la lista de objetos completos para comparar
   const listaComparacionObjetos = [];
   for (let i = 0; i < comparacion.length; i++) {
     const cod = comparacion[i];
@@ -153,9 +149,26 @@ export function App() {
     }
   }
 
+  // Selección del video según el tema actual
+  const urlVideoFondo = tema === "light" ? VIDEO_SOL_MODO_CLARO : VIDEO_LUNA_MODO_OSCURO;
+
   // 8. RENDERIZADO DEL COMPONENTE PRINCIPAL
   return (
     <div className="app-layout">
+      {/* Video de fondo dinámico (Sol para modo claro, Luna para modo oscuro) */}
+      <div className="bg-video-container">
+        <video
+          key={urlVideoFondo}
+          className="bg-video"
+          autoPlay
+          loop
+          muted
+          playsInline
+        >
+          <source src={urlVideoFondo} type="video/mp4" />
+        </video>
+      </div>
+
       {/* Barra Superior */}
       <BarraNavegacion
         pestanaActiva={pestanaActiva}

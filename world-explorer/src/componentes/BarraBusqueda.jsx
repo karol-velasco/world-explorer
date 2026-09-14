@@ -6,10 +6,11 @@ export function BarraBusqueda({ busqueda, setBusqueda, regionSeleccionada, setRe
     <div className="controls-section">
       {/* Campo de Texto para buscar */}
       <div className="search-box">
-        <span className="search-icon">🔍</span>
+        <span className="search-icon">Buscar:</span>
         <input
           type="text"
           className="search-input"
+          style={{ paddingLeft: "80px" }}
           placeholder="Escribe el nombre de un país o capital..."
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
